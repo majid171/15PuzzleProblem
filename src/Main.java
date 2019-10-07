@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Main {
 
@@ -72,13 +71,63 @@ public class Main {
         }
     }
 
+    public static void gbfsH1(Puzzle puzzleInit, Puzzle.DIRECTION[] dir){
+       ArrayList<Puzzle> open = new ArrayList<Puzzle>();
+       open.add(puzzleInit);
+
+       while(!open.isEmpty()){
+           Collections.sort(open, (a, b) -> a.getH1() - b.getH1());
+
+           Puzzle puzzle = open.remove(0);
+
+           if(puzzle.isSolved()){
+               printPath(puzzleInit, puzzle.getPath());
+               return;
+           }
+
+           for (int i = 0; i < dir.length; i++) {
+               if (puzzle.canMove(dir[i])) {
+                   Puzzle newPuzzle = new Puzzle(puzzle);
+                   newPuzzle.move(dir[i]);
+                   open.add(newPuzzle);
+               }
+           }
+
+       }
+    }
+
+    public static void gbfsH2(Puzzle puzzleInit, Puzzle.DIRECTION[] dir){
+        ArrayList<Puzzle> open = new ArrayList<Puzzle>();
+        open.add(puzzleInit);
+
+        while(!open.isEmpty()){
+            Collections.sort(open, (a, b) -> a.getH2() - b.getH2());
+
+            Puzzle puzzle = open.remove(0);
+
+            if(puzzle.isSolved()){
+                printPath(puzzleInit, puzzle.getPath());
+                return;
+            }
+
+            for (int i = 0; i < dir.length; i++) {
+                if (puzzle.canMove(dir[i])) {
+                    Puzzle newPuzzle = new Puzzle(puzzle);
+                    newPuzzle.move(dir[i]);
+                    open.add(newPuzzle);
+                }
+            }
+
+        }
+    }
+
     public static void main(String args[]){
+        // char temp[][] = {{'4', '1', '3', '2'}, {'7','9','5','6'}, {'0','A','B','C'}, {'D','E','F','8'}};
 
         String file = "testCase0.txt";
         char temp[][] = load(file);
         Puzzle.DIRECTION[] strategy = {Puzzle.DIRECTION.RIGHT, Puzzle.DIRECTION.DOWN, Puzzle.DIRECTION.UP, Puzzle.DIRECTION.LEFT};
         Puzzle p = new Puzzle(temp); // The initial puzzle
-        BFS(p, strategy);
-
+        gbfsH2(p, strategy);
     }
 }
