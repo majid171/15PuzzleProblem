@@ -1,20 +1,20 @@
 import java.util.Arrays;
 
 public class Puzzle {
-    public enum DIRECTION {UP, DOWN, LEFT, RIGHT}
 
+    public enum DIRECTION {UP, DOWN, LEFT, RIGHT}
     private final char[][] puzzle;
     private static final char[][] goal = {{'1', '2', '3', '4'}, {'5', '6', '7', '8'}, {'9', 'A', 'B', 'C'}, {'D', 'E', 'F', '0'}};
-    private String path = "";
-    private int zeroX, zeroY;
-    private int h1; // Heuristics Function (Misplaced Tiles)
-    private int h2; // Heuristics Function (Manhattan Distance)
+    private String path = ""; // Path from root to current Puzzle
+    private int zeroX, zeroY; // Position of the 'blank'
+    private int g;
+    private Puzzle parent;
 
     public Puzzle(char[][] puzzle) {
         this.puzzle = puzzle;
         findZeroTile();
-        calculateH1();
-        calculateH2();
+        g = 0;
+        parent = null;
     }
 
     public Puzzle(Puzzle newPuzzle) {
@@ -24,22 +24,31 @@ public class Puzzle {
             puzzle[i] = Arrays.copyOf(newPuzzle.puzzle[i], puzzle[i].length);
         }
 
-        h1 = newPuzzle.h1;
-        h2 = newPuzzle.h2;
+        parent = newPuzzle;
+        g = parent.g() + 1;
         zeroX = newPuzzle.zeroX;
         zeroY = newPuzzle.zeroY;
         path = newPuzzle.path;
     }
 
-    public void calculateH1(){
+    // Misplaced tiles heuristic
+    public int h1(){
+
+        int h1 = 0;
+
         for(int i = 0; i < puzzle.length; i++){
             for(int j = 0; j < puzzle[i].length; j++){
                 if(puzzle[i][j] != goal[i][j]) h1++;
             }
         }
+
+        return h1;
     }
 
-    public void calculateH2(){
+    // Manhattan distance heuristic
+    public int h2(){
+
+        int h2 = 0;
 
         for(int i = 0; i < puzzle.length; i++){
             for(int j = 0; j < puzzle[i].length; j++){
@@ -54,8 +63,10 @@ public class Puzzle {
                 }
             }
         }
+        return h2;
     }
 
+    // Check whether a current Puzzle has been solved
     public boolean isSolved() {
         for (int i = 0; i < puzzle.length; i++) {
             for (int j = 0; j < puzzle[i].length; j++) {
@@ -67,6 +78,7 @@ public class Puzzle {
         return true;
     }
 
+    // Check if we can move the black in a certain direction
     public boolean canMove(DIRECTION dir) {
         switch (dir) {
             case UP:
@@ -93,6 +105,7 @@ public class Puzzle {
         return false;
     }
 
+    // Moving the blank a certain direction
     public void move(DIRECTION dir) {
         switch (dir) {
             case UP:
@@ -114,7 +127,7 @@ public class Puzzle {
         }
     }
 
-    // Override function used to print the path
+    // Override function used to print the path after solution was found
     public void move(char dir) {
         switch (dir) {
             case 'U':
@@ -148,6 +161,7 @@ public class Puzzle {
         return puzzle[i][j];
     }
 
+    // Used to find the location of the 'blank'
     private void findZeroTile() {
         for (int i = 0; i < puzzle.length; i++) {
             for (int j = 0; j < puzzle[i].length; j++) {
@@ -157,22 +171,6 @@ public class Puzzle {
                 }
             }
         }
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public int getH1(){
-        return h1;
-    }
-
-    public int getH2(){
-        return h2;
-    }
-
-    public char[][] getPuzzle() {
-        return puzzle;
     }
 
     public String toString() {
@@ -185,4 +183,25 @@ public class Puzzle {
         }
         return output;
     }
+
+    public String getPath() {
+        return path;
+    }
+
+    public char[][] getPuzzle() {
+        return puzzle;
+    }
+
+    public int g(){
+        return g;
+    }
+
+    public int f1(){
+        return g() + h1();
+    }
+
+    public int f2(){
+        return g() + h2();
+    }
+
 }
