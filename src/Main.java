@@ -41,7 +41,7 @@ public class Main {
             }
         }
 
-        printCutOff(puzzleInit);
+        printCutOff(puzzleInit); // If no solution
     }
 
     // Greedy-Best-First-Search Implementation
@@ -82,7 +82,7 @@ public class Main {
             }
         }
 
-        printCutOff(puzzleInit);
+        printCutOff(puzzleInit);// If no solution
     }
 
     // A* Search Implementation
@@ -123,9 +123,13 @@ public class Main {
             }
         }
 
-        printCutOff(puzzleInit);
+        printCutOff(puzzleInit); // If no solution
     }
-    
+
+    /*
+        Implementation of IDA*
+        This is the driver function
+    */
     public static void ida(Puzzle p, Puzzle.DIRECTION[] dir, int hType){
         ArrayList<Puzzle>path = new ArrayList<Puzzle>();
         int bound = hType == 1 ? p.h1(): p.h2();
@@ -140,16 +144,18 @@ public class Main {
                 return;
             }
 
-            if(temp > MAX_TIME){
+            if(temp > MAX_TIME){ // If no solution in certain amount of time
                 printCutOff(p);
                 return;
             }
-
             bound = temp;
         }
-
     }
 
+    /*
+            Implementation of IDA*
+            Used to search tree up to a certain threshold
+    */
     public static int search(ArrayList<Puzzle> path, int g, int bound, Puzzle.DIRECTION[] dir, int numberOfNodesExpanded, int fringe, int numberOfNodesAccessed, int hType){
         Puzzle curr = path.get(path.size() - 1);
         numberOfNodesAccessed++;
@@ -181,6 +187,10 @@ public class Main {
         return min;
     }
 
+    /*
+        Implementation of IDA*
+        Function to retrieve children of current puzzle
+    */
     public static ArrayList<Puzzle> getSuccessors(Puzzle p, Puzzle.DIRECTION[] dir){
 
         ArrayList<Puzzle>children = new ArrayList<Puzzle>();
@@ -199,8 +209,8 @@ public class Main {
     // Prints path of solution, along with other required information
     public static void printOutput(Puzzle start, String endPath, int depth, int numberOfNodesExpanded, int fringe, int numberOfNodesAccessed){
 
+        // Printing the path
         System.out.println(start.toString());
-
         for(int i = 0; i < endPath.length(); i++){
             char move = endPath.charAt(i);
 
@@ -209,17 +219,22 @@ public class Main {
             System.out.println(start.toString());
         }
 
+        // Printing extra output
         System.out.println("The depth of the solution is: " + depth);
         System.out.println("The number of nodes expanded: " + numberOfNodesExpanded);
         System.out.println("The maximum size of the fringe: " + fringe);
         System.out.println("The number of states accessed: " + numberOfNodesAccessed);
     }
 
+    // Used to write an error message when a cutoff occurs
     public static void printCutOff(Puzzle start){
         System.out.println("A cutoff has occurred...\nNo solution was found for this puzzle state.\n" + start.toString());
     }
 
-    // Loads the puzzle from a text file
+    /*
+        Function used to load a puzzla from a text file
+        Format of file must be ... <1 2 3 ... E F 0>
+    */
     public static char[][] load(String file){
 
         char[][] puzzle =  new char[4][4];
@@ -250,12 +265,12 @@ public class Main {
         return null;
     }
 
-    // Loads puzzle manually by user
+    // Loads puzzle manually by user... <1 2 3... E F 0>
     public static char[][] enterPuzzle(){
         char[][] input = new char[4][4];
         Scanner in = new Scanner(System.in);
 
-        System.out.println("Enter numbers separated by spaces");
+        System.out.println("Enter numbers separated by spaces (1 2 3... E F 0)");
 
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 4; j++){
@@ -339,13 +354,6 @@ public class Main {
     }
 
     public static void main(String args[]){
-
-//        char temp[][] = {{'5', '1', '2', '4'}, {'6','A','3','7'}, {'9','0','C','8'}, {'D','E','B','F'}};
-//        String file = "testCase0.txt";
-////        char temp[][] = load(file);
-//        Puzzle.DIRECTION[] strategy = {Puzzle.DIRECTION.RIGHT, Puzzle.DIRECTION.DOWN, Puzzle.DIRECTION.UP, Puzzle.DIRECTION.LEFT};
-//        Puzzle p = new Puzzle(temp);
-//        ida(p, strategy, 2);
         run();
     }
 }

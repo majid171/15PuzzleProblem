@@ -2,13 +2,13 @@ import java.util.Arrays;
 
 public class Puzzle {
 
-    public enum DIRECTION {UP, DOWN, LEFT, RIGHT}
-    private final char[][] puzzle;
-    private static final char[][] goal = {{'1', '2', '3', '4'}, {'5', '6', '7', '8'}, {'9', 'A', 'B', 'C'}, {'D', 'E', 'F', '0'}};
+    public enum DIRECTION {UP, DOWN, LEFT, RIGHT} // An Enum for direction options
+    private final char[][] puzzle; // The puzzle Board
+    private static final char[][] goal = {{'1', '2', '3', '4'}, {'5', '6', '7', '8'}, {'9', 'A', 'B', 'C'}, {'D', 'E', 'F', '0'}}; // Goal State
     private String path = ""; // Path from root to current Puzzle
     private int zeroX, zeroY; // Position of the 'blank'
-    private int g;
-    private Puzzle parent;
+    private int g; // G value, i.e. depth of node
+    private Puzzle parent; // Parent of the current Node
 
     public Puzzle(char[][] puzzle) {
         this.puzzle = puzzle;
@@ -17,18 +17,19 @@ public class Puzzle {
         parent = null;
     }
 
-    public Puzzle(Puzzle newPuzzle) {
-        puzzle = new char[newPuzzle.puzzle.length][newPuzzle.puzzle[0].length];
+    // Deep copy of the puzzle object, used when expanding node into children
+    public Puzzle(Puzzle p) {
+        puzzle = new char[p.puzzle.length][p.puzzle[0].length];
 
         for (int i = 0; i < puzzle.length; i++) {
-            puzzle[i] = Arrays.copyOf(newPuzzle.puzzle[i], puzzle[i].length);
+            puzzle[i] = Arrays.copyOf(p.puzzle[i], puzzle[i].length);
         }
 
-        parent = newPuzzle;
+        parent = p;
         g = parent.g() + 1;
-        zeroX = newPuzzle.zeroX;
-        zeroY = newPuzzle.zeroY;
-        path = newPuzzle.path;
+        zeroX = p.zeroX;
+        zeroY = p.zeroY;
+        path = p.path;
     }
 
     // Misplaced tiles heuristic
@@ -145,12 +146,13 @@ public class Puzzle {
         }
     }
 
-    private void swap(int y1, int x1, int y2, int x2) {
-        char previous = getTile(y1, x1);
-        setTile(y1, x1, getTile(y2, x2));
-        setTile(y2, x2, previous);
-        zeroY = y2;
-        zeroX = x2;
+    // Used to swap 2 tiles, then updates the blank tile position
+    private void swap(int i1, int j1, int i2, int j2) {
+        char previous = getTile(i1, j1);
+        setTile(i1, j1, getTile(i2, j2));
+        setTile(i2, j2, previous);
+        zeroY = i2;
+        zeroX = j2;
     }
 
     private void setTile(int i, int j, char tile) {
@@ -161,7 +163,7 @@ public class Puzzle {
         return puzzle[i][j];
     }
 
-    // Used to find the location of the 'blank'
+    // Used to find the initial location of the 'blank'
     private void findZeroTile() {
         for (int i = 0; i < puzzle.length; i++) {
             for (int j = 0; j < puzzle[i].length; j++) {
